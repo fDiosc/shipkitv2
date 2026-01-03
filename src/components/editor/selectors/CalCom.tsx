@@ -5,6 +5,7 @@ import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import Cal, { getCalApi } from "@calcom/embed-react";
 import { useEffect } from "react";
+import { Calendar } from "lucide-react";
 
 export const CalCom = ({
     calLink,
@@ -30,10 +31,8 @@ export const CalCom = ({
 
     // Priority: 
     // 1. Specifically set in this block (calLink prop)
-    // 2. Project-level integration
-    // 3. Global-level integration
-    // 4. Default fallback
-    const link = calLink || integrations?.calCom || "peerlist/demo";
+    // 2. Global/Project-level integration
+    const link = calLink || integrations?.calCom;
 
     return (
         <div
@@ -49,12 +48,28 @@ export const CalCom = ({
                 </p>
             </div>
 
-            <div className="max-w-4xl mx-auto rounded-[2.5rem] overflow-hidden border border-neutral-100 premium-shadow bg-white">
-                <Cal
-                    calLink={link}
-                    style={{ width: "100%", height: "100%", minHeight: "600px" }}
-                    config={{ layout: "month_view" }}
-                />
+            <div className="max-w-4xl mx-auto rounded-[2.5rem] overflow-hidden border border-neutral-100 premium-shadow bg-white min-h-[400px] flex items-center justify-center">
+                {link ? (
+                    <Cal
+                        calLink={link}
+                        style={{ width: "100%", height: "100%", minHeight: "600px" }}
+                        config={{ layout: "month_view" }}
+                    />
+                ) : (
+                    <div className="text-center p-12 space-y-6">
+                        <div className="w-16 h-16 bg-blue-50 text-blue-600 rounded-2xl flex items-center justify-center mx-auto">
+                            <Calendar className="w-8 h-8" />
+                        </div>
+                        <div className="space-y-2">
+                            <h3 className="text-xl font-bold text-neutral-900">Cal.com Link Required</h3>
+                            <p className="text-neutral-500 max-w-sm mx-auto">
+                                To enable the booking calendar, please provide a link. You can set a global link in
+                                <span className="font-bold text-neutral-900"> Project Settings</span> or configure
+                                this specific block in the <span className="font-bold text-neutral-900">Sidebar</span>.
+                            </p>
+                        </div>
+                    </div>
+                )}
             </div>
         </div>
     );
@@ -70,12 +85,15 @@ const CalComSettings = () => {
     return (
         <div className="space-y-4">
             <div className="space-y-2">
-                <Label>Cal.com Link (e.g., peerlist/demo)</Label>
+                <Label>Cal.com Link (e.g., username/meeting)</Label>
                 <Input
                     value={calLink}
-                    placeholder="username/event"
+                    placeholder="username/meeting-type"
                     onChange={(e) => setProp((props: any) => props.calLink = e.target.value)}
                 />
+                <p className="text-[10px] text-neutral-400 italic">
+                    Overrides Project Settings for this block only.
+                </p>
             </div>
             <div className="space-y-2">
                 <Label>Section Title</Label>
@@ -98,7 +116,7 @@ const CalComSettings = () => {
 CalCom.craft = {
     displayName: "Cal.com Scheduler",
     props: {
-        calLink: "peerlist/demo",
+        calLink: "",
         title: "Ready to get started?",
         subtitle: "Schedule a quick call with our team to explore the possibilities.",
     },

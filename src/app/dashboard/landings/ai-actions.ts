@@ -15,6 +15,8 @@ export async function generateLandingMagic(formData: FormData) {
     const name = formData.get("name") as string;
     const subdomain = formData.get("subdomain") as string;
     const description = formData.get("description") as string;
+    const audience = formData.get("audience") as string;
+    const stage = formData.get("stage") as string;
 
     // Check Landing Limit
     const { allowed: landingAllowed } = await checkLandingLimit();
@@ -39,7 +41,7 @@ export async function generateLandingMagic(formData: FormData) {
 
     try {
         // 1. Generate Content via AI
-        const aiData = await generateLandingContent(description);
+        const aiData = await generateLandingContent(description, audience, stage);
 
         // 2. Map AI data to Craft.js JSON structure
         const primary = aiData.theme.primaryColor || "#6366f1";

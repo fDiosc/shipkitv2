@@ -25,3 +25,12 @@ export async function updateProfile(data: { calComUsername?: string }) {
         return { success: false, error: "Failed to update profile" };
     }
 }
+
+export async function getProfile() {
+    const { userId } = await auth();
+    if (!userId) return null;
+
+    return await db.query.profiles.findFirst({
+        where: eq(profiles.id, userId),
+    });
+}

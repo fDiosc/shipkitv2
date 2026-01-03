@@ -45,7 +45,10 @@ export default async function SettingsPage() {
                     </CardContent>
                 </Card>
 
-                <IntegrationsSettings initialCalComUsername={profile?.calComUsername} />
+                <IntegrationsSettings
+                    initialCalComUsername={profile?.calComUsername}
+                    onboardingStatus={profile?.onboardingStatus as any}
+                />
 
                 <Card className="shadow-sm border-red-100 bg-red-50/30">
                     <CardHeader>

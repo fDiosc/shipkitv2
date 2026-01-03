@@ -24,6 +24,8 @@ import { toast } from "sonner";
 import { UpgradeModal } from "./UpgradeModal";
 import { checkAIGenerationLimit } from "@/app/actions/usage";
 import { useEffect } from "react";
+import { Wizard, WizardStep } from "./Wizard";
+import { getProfile } from "@/app/actions/profile";
 
 export function NewLandingModal({ children }: { children?: React.ReactNode }) {
     const [open, setOpen] = useState(false);
@@ -31,13 +33,37 @@ export function NewLandingModal({ children }: { children?: React.ReactNode }) {
     const [mode, setMode] = useState<"template" | "ai">("ai");
     const [upgradeType, setUpgradeType] = useState<"ai" | "landings" | null>(null);
     const [aiUsage, setAiUsage] = useState<{ remaining: number | string } | null>(null);
+    const [showWizard, setShowWizard] = useState(false);
     const router = useRouter();
 
     useEffect(() => {
         if (open) {
             checkAIGenerationLimit().then(setAiUsage);
+
+            // Check onboarding status
+            getProfile().then(profile => {
+                const status = (profile?.onboardingStatus as any) || {};
+                if (!status.firstLanding) {
+                    setShowWizard(true);
+                }
+            });
         }
     }, [open]);
+
+    const wizardSteps: WizardStep[] = [
+        {
+            title: "Let's build your first page! 🚀",
+            description: "ShipKit uses advanced AI to generate high-converting landing pages. Follow these tips to get the best results.",
+        },
+        {
+            title: "Detail is your superpower ✍️",
+            description: "The more detail you provide, the better. Describe your product's value proposition, key features, and even pricing if you wish. The AI will weave this into a professional narrative.",
+        },
+        {
+            title: "Audience & Stage 🎯",
+            description: "Choose your target audience and product stage. This helps the AI adjust the tone—from 'exciting pre-launch' to 'scalable enterprise solution'.",
+        },
+    ];
 
     async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
         event.preventDefault();
@@ -138,10 +164,42 @@ export function NewLandingModal({ children }: { children?: React.ReactNode }) {
                                     <Textarea
                                         id="description"
                                         name="description"
-                                        className="h-32 hide-scrollbar resize-none"
+                                        className="h-24 hide-scrollbar resize-none"
                                         placeholder="Explain what your product does, who it's for, and what makes it special. We'll generate the copy and layout for you."
                                         required={mode === "ai"}
                                     />
+                                </div>
+
+                                <div className="grid grid-cols-2 gap-4">
+                                    <div className="grid gap-2">
+                                        <Label htmlFor="audience">Target Audience</Label>
+                                        <Select name="audience" defaultValue="General">
+                                            <SelectTrigger id="audience">
+                                                <SelectValue placeholder="Select audience" />
+                                            </SelectTrigger>
+                                            <SelectContent>
+                                                <SelectItem value="Developers">Developers</SelectItem>
+                                                <SelectItem value="Founders">Founders</SelectItem>
+                                                <SelectItem value="Marketers">Marketers</SelectItem>
+                                                <SelectItem value="Designers">Designers</SelectItem>
+                                                <SelectItem value="General">General</SelectItem>
+                                            </SelectContent>
+                                        </Select>
+                                    </div>
+                                    <div className="grid gap-2">
+                                        <Label htmlFor="stage">Product Stage</Label>
+                                        <Select name="stage" defaultValue="MVP">
+                                            <SelectTrigger id="stage">
+                                                <SelectValue placeholder="Select stage" />
+                                            </SelectTrigger>
+                                            <SelectContent>
+                                                <SelectItem value="Pre-launch">Pre-launch</SelectItem>
+                                                <SelectItem value="MVP">MVP</SelectItem>
+                                                <SelectItem value="Growth">Growth</SelectItem>
+                                                <SelectItem value="Scale">Scale</SelectItem>
+                                            </SelectContent>
+                                        </Select>
+                                    </div>
                                 </div>
                             </TabsContent>
 
@@ -194,6 +252,13 @@ export function NewLandingModal({ children }: { children?: React.ReactNode }) {
                     ? "You've used your 10 free AI generations this month. Upgrade to Pro for unlimited magic! ✨"
                     : "Wait! You've reached the free limit of 2 landing pages. Ready to go big? 🚀"
                 }
+            />
+
+            <Wizard
+                wizardKey="firstLanding"
+                isOpen={showWizard}
+                steps={wizardSteps}
+                onClose={() => setShowWizard(false)}
             />
         </Dialog>
     );

@@ -1,9 +1,38 @@
 "use client";
 
+import { useState, useEffect } from "react";
+import { Wizard, WizardStep } from "@/components/dashboard/Wizard";
+import { getProfile } from "@/app/actions/profile";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { BarChart3, TrendingUp, Users, DollarSign } from "lucide-react";
 
 export default function AnalyticsPage() {
+    const [showWizard, setShowWizard] = useState(false);
+
+    useEffect(() => {
+        getProfile().then(profile => {
+            const status = (profile?.onboardingStatus as any) || {};
+            if (!status.analyticsTour) {
+                setShowWizard(true);
+            }
+        });
+    }, []);
+
+    const analyticsSteps: WizardStep[] = [
+        {
+            title: "Growth Insights 📊",
+            description: "Welcome to your performance hub. Here you can track how your landing pages are converting visitors into leads.",
+        },
+        {
+            title: "The Funnel  funnel",
+            description: "Track 'Total Views' against 'Total Leads' to see your conversion rate. A healthy landing page usually converts between 2% and 10%.",
+        },
+        {
+            title: "Data Refreshing ⏳",
+            description: "Analytics data is updated daily. Once you launch a page and get your first visitors, the charts below will come to life.",
+        },
+    ];
+
     return (
         <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
             <div>
@@ -27,6 +56,13 @@ export default function AnalyticsPage() {
                     <p className="text-neutral-400 text-sm italic">No data available yet. Launch a page to start tracking.</p>
                 </CardContent>
             </Card>
+
+            <Wizard
+                wizardKey="analyticsTour"
+                isOpen={showWizard}
+                steps={analyticsSteps}
+                onClose={() => setShowWizard(false)}
+            />
         </div>
     );
 }

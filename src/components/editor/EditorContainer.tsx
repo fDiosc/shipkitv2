@@ -20,6 +20,9 @@ import { Header } from "./selectors/Header";
 import { Footer } from "./selectors/Footer";
 
 import { LandingProvider } from "./LandingContext";
+import { useState, useEffect } from "react";
+import { Wizard, WizardStep } from "../dashboard/Wizard";
+import { getProfile } from "@/app/actions/profile";
 
 export function EditorContainer({
     landingId,
@@ -34,6 +37,40 @@ export function EditorContainer({
         calCom?: string | null;
     };
 }) {
+    const [showWizard, setShowWizard] = useState(false);
+
+    useEffect(() => {
+        getProfile().then(profile => {
+            const status = (profile?.onboardingStatus as any) || {};
+            if (!status.editorTour) {
+                setShowWizard(true);
+            }
+        });
+    }, []);
+
+    const tourSteps: WizardStep[] = [
+        {
+            title: "Welcome to the Editor! 🎨",
+            description: "This is where the magic happens. Here you can customize every detail of your landing page.",
+        },
+        {
+            title: "Drag & Drop Toolbox 🧰",
+            description: "On the left, you'll find the Toolbox. Simply drag elements like Text, Buttons, or complex sections like Cal.com into your page.",
+        },
+        {
+            title: "Visual Editing 🖱️",
+            description: "Click on any element in the center area to select it. Once selected, its specific properties will appear in the right sidebar.",
+        },
+        {
+            title: "Style & Settings ⚙️",
+            description: "Use the right Sidebar to change text, colors, alignments, and specific integration links like your Cal.com username.",
+        },
+        {
+            title: "Device Preview 📱",
+            description: "Use the topbar toggles to see how your page looks on Mobile, Tablet, and Desktop. Don't forget to 'Save Draft' often!",
+        },
+    ];
+
     return (
         <Editor
             resolver={{
@@ -78,6 +115,13 @@ export function EditorContainer({
                     </div>
                 </div>
             </LandingProvider>
+
+            <Wizard
+                wizardKey="editorTour"
+                isOpen={showWizard}
+                steps={tourSteps}
+                onClose={() => setShowWizard(false)}
+            />
         </Editor>
     );
 }

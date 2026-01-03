@@ -9,6 +9,7 @@ import { auth } from "@clerk/nextjs/server";
 import { eq, count, inArray } from "drizzle-orm";
 import { redirect } from "next/navigation";
 import { Badge } from "@/components/ui/badge";
+import { DashboardWizard } from "@/components/dashboard/DashboardWizard";
 
 export default async function DashboardPage() {
     const { userId } = await auth();
@@ -150,6 +151,8 @@ export default async function DashboardPage() {
                     </Card>
                 </div>
             )}
+
+            <DashboardWizard />
         </div>
     );
 }

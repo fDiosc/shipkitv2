@@ -18,8 +18,9 @@ import {
     DropdownMenuItem,
     DropdownMenuTrigger
 } from "@/components/ui/dropdown-menu";
-import { MoreHorizontal, ExternalLink, Edit3, Trash2, Users } from "lucide-react";
+import { MoreHorizontal, ExternalLink, Edit3, Users } from "lucide-react";
 import { NewLandingModal } from "@/components/dashboard/NewLandingModal";
+import { DeleteLandingAction } from "@/components/dashboard/DeleteLandingAction";
 import Link from "next/link";
 import { getLandingUrl } from "@/lib/urls";
 
@@ -113,9 +114,7 @@ export default async function LandingsPage() {
                                                         <ExternalLink className="h-4 w-4" /> View Live
                                                     </a>
                                                 </DropdownMenuItem>
-                                                <DropdownMenuItem className="flex items-center gap-2 text-red-600 focus:text-red-700">
-                                                    <Trash2 className="h-4 w-4" /> Delete
-                                                </DropdownMenuItem>
+                                                <DeleteLandingAction id={landing.id} name={landing.name} />
                                             </DropdownMenuContent>
                                         </DropdownMenu>
                                     </TableCell>

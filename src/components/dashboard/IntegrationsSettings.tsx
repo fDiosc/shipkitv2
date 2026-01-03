@@ -9,13 +9,33 @@ import { toast } from "sonner";
 import { updateProfile } from "@/app/actions/profile";
 import { Calendar } from "lucide-react";
 
+import { Wizard, WizardStep } from "./Wizard";
+
 export function IntegrationsSettings({
-    initialCalComUsername
+    initialCalComUsername,
+    onboardingStatus
 }: {
-    initialCalComUsername?: string | null
+    initialCalComUsername?: string | null;
+    onboardingStatus?: { settingsTour?: boolean };
 }) {
     const [calComUsername, setCalComUsername] = useState(initialCalComUsername || "");
     const [loading, setLoading] = useState(false);
+    const [showWizard, setShowWizard] = useState(!onboardingStatus?.settingsTour);
+
+    const wizardSteps: WizardStep[] = [
+        {
+            title: "Global Integrations 🔌",
+            description: "Connect your favorite tools once, and they'll work across all your landing pages automatically.",
+        },
+        {
+            title: "Cal.com Scheduler 🗓️",
+            description: "Enter your Cal.com username and event (e.g., 'felipe/15min'). This becomes the default for any new Cal.com block you add to your pages.",
+        },
+        {
+            title: "Saving Time ⚡",
+            description: "By setting a global default, you don't need to re-configure your booking link every time you create a new project.",
+        },
+    ];
 
     const handleSave = async () => {
         setLoading(true);
@@ -67,7 +87,6 @@ export function IntegrationsSettings({
                         </p>
                     </div>
                 </div>
-
                 <div className="flex justify-end">
                     <Button
                         onClick={handleSave}
@@ -78,6 +97,13 @@ export function IntegrationsSettings({
                     </Button>
                 </div>
             </CardContent>
-        </Card>
+
+            <Wizard
+                wizardKey="settingsTour"
+                isOpen={showWizard}
+                steps={wizardSteps}
+                onClose={() => setShowWizard(false)}
+            />
+        </Card >
     );
 }

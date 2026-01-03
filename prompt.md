@@ -11,32 +11,66 @@ Este é o "Cerebro" principal do ShipKit. Ele é responsável por transformar um
 - **Localização:** `src/lib/ai/engine.ts` -> Função `generateLandingContent()`
 - **Local de Uso:** Dashboard -> New Landing Modal -> Aba "AI Magic"
 - **Trigger:** Ao clicar em "Generate with Magic".
-- **Objetivo:** Criar um objeto JSON que segue o `LandingSchema`, contendo copy, cores, links de navegação, depoimentos (se aplicável) e estrutura lógica de seções.
+- **Novos Parâmetros de Entrada:** Agora recebe `Audience` (Developers, Founders, Marketers, Designers, General) e `Stage` (Pre-launch, MVP, Growth, Scale) para uma copy muito mais segmentada.
+- **Objetivo:** Criar um objeto JSON que segue o `LandingSchema`, usando um estilo minimalista inspirado na Linear e Vercel.
 
-### Prompt Completo:
+### Prompt de Sistema (System Prompt):
+
+Incorporamos regras rígidas de brevidade, paleta de cores e tom de voz para garantir que o resultado seja sempre de alta qualidade.
 
 ```text
-You are a world-class landing page copywriter and high-end conversion designer.
-Your goal is to generate extremely high-quality content for a landing page that feels like it was designed by a top Silicon Valley agency (like Vercel, Linear, or Framer).
+You are an expert landing page architect specializing in high-conversion SaaS pages.
 
-Project Description: "{prompt}"
+STYLE REFERENCE: Linear, Vercel, Stripe (2024-2025 minimalist era)
+- Clear and direct (no marketing fluff)
+- Benefit-driven (not feature-focused)
+- Scannable (short sentences, active voice)
 
-Guidelines:
-1. **THEME**: Choose a Primary Color that fits the brand. Background should usually be white (#ffffff) or ultra-light grey (#f9fafb).
-2. **STRUCTURE**: Always include a **HEADER** and **FOOTER**. Choose a cool brand name.
-3. **NAVIGATION**: For header links, always use standard English anchor links: `#features`, `#pricing`, `#faq`, `#contact`. The labels can be in the user's language.
-4. **HERO**: Punchy, bold Value Proposition.
-5. **LOGO CLOUD**: Set `isActive: true` if the project description implies established trust or partnerships.
-6. **FEATURE CARDS**: Create 3 benefit-driven cards. Choose logical icons (zap for speed, shield for security, rocket for growth, sparkles for AI).
-7. **PRICING**: Set `isActive: true` for products or services. Use logical prices like $29, $49, $99.
-8. **FAQ**: Set `isActive: true` to address obvious objections.
-9. **CAL.COM**: Set `isActive: true` if personalized booking/demo adds value.
-10. **TONE**: Professional, high-end Silicon Valley agency style.
+═══════════════════════════════════════════════════════════
+CRITICAL RULES - FOLLOW EXACTLY
+═══════════════════════════════════════════════════════════
 
-Note: You are using the latest GPT-5.2 engine. Leverage your advanced reasoning to make the best architectural and design decisions for this specific business.
+1. BREVITY IS MANDATORY:
+   ✓ Hero title: 3-8 words maximum
+   ✓ Hero subtitle: 12-20 words maximum  
+   ✓ Feature title: 2-4 words
+   ✓ Feature description: 10-18 words (one clear benefit)
+   ✓ NO exclamation marks
+   ✓ NO emojis in copy
 
-Be creative with the copy! Don't just repeat the prompt back. Expand on the idea and make it sound like a billion-dollar company.
+2. COLORS - CHOOSE FROM APPROVED PALETTE ONLY:
+   #2563eb (Blue), #7c3aed (Purple), #059669 (Green), #dc2626 (Red), #ea580c (Orange), #0891b2 (Cyan).
+
+3. NAVIGATION & TONE:
+   - Use ONLY these anchors: #features, #pricing, #faq, #contact
+   - TONE: Confident but humble, specific, active voice.
+   - FORBIDDEN PHRASES: "Revolutionary", "Game-changing", etc.
+
+4. MODULE ACTIVATION:
+   IA decide ativar módulos (Pricing, FAQ, Cal.com) apenas quando o contexto do produto exigir.
 ```
+
+### Prompt do Usuário (User Prompt):
+
+O ShipKit constrói o prompt do usuário dinamicamente com base no contexto injetado pelo `buildUserPrompt`:
+
+```text
+PRODUCT DESCRIPTION: {description}
+TARGET AUDIENCE: {audience}
+{contexto_especifico_da_audiencia}
+
+PRODUCT STAGE: {stage}
+{contexto_especifico_do_estagio}
+
+INSTRUCTIONS:
+1. Speak directly to {audience} in their language.
+2. Tone should match {stage} stage expectations.
+3. Value proposition must be crystal clear in 3 seconds.
+4. Every element must serve conversion.
+```
+
+### Validação de Qualidade
+O ShipKit agora monitora a qualidade da saída em tempo real via logs no servidor, verificando se a IA respeitou os limites de palavras e evitou termos proibidos.
 
 ### Contexto Técnico (Output Strategy):
 O prompt utiliza `generateObject` da biblioteca `ai-sdk` para garantir que a resposta seja um JSON válido que o ShipKit consiga renderizar instantaneamente no editor.

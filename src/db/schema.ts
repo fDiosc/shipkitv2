@@ -11,6 +11,7 @@ export const profiles = pgTable("profiles", {
   calComUsername: varchar("cal_com_username", { length: 255 }),
   aiGenerationsUsed: integer("ai_generations_used").default(0).notNull(),
   aiGenerationsResetAt: timestamp("ai_generations_reset_at").defaultNow().notNull(),
+  onboardingStatus: jsonb("onboarding_status").default({}),
   createdAt: timestamp("created_at").defaultNow().notNull(),
   updatedAt: timestamp("updated_at").defaultNow().notNull(),
 });

@@ -1,5 +1,6 @@
 import { Sidebar } from "@/components/dashboard/Sidebar";
 import { Topbar } from "@/components/dashboard/Topbar";
+import { ContextualHelp } from "@/components/dashboard/ContextualHelp";
 
 export default function DashboardLayout({
     children,
@@ -23,6 +24,7 @@ export default function DashboardLayout({
                     </div>
                 </main>
             </div>
+            <ContextualHelp />
         </div>
     );
 }
