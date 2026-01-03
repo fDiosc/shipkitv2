@@ -1,5 +1,5 @@
 import { db } from "@/db";
-import { landings } from "@/db/schema";
+import { landings, profiles } from "@/db/schema";
 import { eq } from "drizzle-orm";
 import { notFound } from "next/navigation";
 import { PublicRenderer } from "@/components/editor/PublicRenderer";
@@ -19,14 +19,24 @@ export default async function PublicLandingPage({
         notFound();
     }
 
-    // In production, we would check status:
-    // if (landing.status !== "published") notFound();
+    const profile = await db.query.profiles.findFirst({
+        where: eq(profiles.id, landing.userId),
+    });
+
+    const projectIntegrations = (landing.integrations as any) || {};
+    const integrations = {
+        calCom: projectIntegrations.calCom || profile?.calComUsername
+    };
 
     const designData = landing.designJson as any;
 
     return (
         <div className="min-h-screen bg-white">
-            <PublicRenderer data={designData} landingId={landing.id} />
+            <PublicRenderer
+                data={designData}
+                landingId={landing.id}
+                integrations={integrations}
+            />
 
             {/* Branding badge */}
             <div className="fixed bottom-4 right-4 z-50">

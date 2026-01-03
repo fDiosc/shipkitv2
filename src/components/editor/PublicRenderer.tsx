@@ -36,6 +36,9 @@ import { LandingProvider } from './LandingContext';
 interface PublicRendererProps {
     data: string | any;
     landingId: string;
+    integrations?: {
+        calCom?: string | null;
+    };
 }
 
 /**
@@ -43,7 +46,7 @@ interface PublicRendererProps {
  * This provides the necessary context for selectors like Container and Hero
  * while ensuring the page is not interactive/editable.
  */
-export const PublicRenderer: React.FC<PublicRendererProps> = ({ data, landingId }) => {
+export const PublicRenderer: React.FC<PublicRendererProps> = ({ data, landingId, integrations }) => {
     if (!data) {
         return (
             <div className="flex items-center justify-center p-20 text-neutral-400 italic">
@@ -56,7 +59,7 @@ export const PublicRenderer: React.FC<PublicRendererProps> = ({ data, landingId 
     const jsonString = typeof data === 'string' ? data : JSON.stringify(data);
 
     return (
-        <LandingProvider landingId={landingId}>
+        <LandingProvider landingId={landingId} integrations={integrations}>
             <Editor enabled={false} resolver={publicResolvers}>
                 <div className="public-render-root">
                     <Frame data={jsonString} />

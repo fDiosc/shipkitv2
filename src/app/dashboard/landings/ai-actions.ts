@@ -6,6 +6,7 @@ import { auth } from "@clerk/nextjs/server";
 import { revalidatePath } from "next/cache";
 import { eq } from "drizzle-orm";
 import { generateLandingContent } from "@/lib/ai/engine";
+import { checkLandingLimit, checkAIGenerationLimit, incrementAIGenerationProgress } from "@/app/actions/usage";
 
 export async function generateLandingMagic(formData: FormData) {
     const { userId } = await auth();
@@ -14,6 +15,18 @@ export async function generateLandingMagic(formData: FormData) {
     const name = formData.get("name") as string;
     const subdomain = formData.get("subdomain") as string;
     const description = formData.get("description") as string;
+
+    // Check Landing Limit
+    const { allowed: landingAllowed } = await checkLandingLimit();
+    if (!landingAllowed) {
+        return { success: false, error: "Landing limit reached. Upgrade to Pro for unlimited landings! 🚀" };
+    }
+
+    // Check AI Limit
+    const { allowed: aiAllowed, remaining } = await checkAIGenerationLimit();
+    if (!aiAllowed) {
+        return { success: false, error: "Monthly AI generation limit reached. Upgrade to Pro for unlimited magic! ✨" };
+    }
 
     // 0. Pre-check subdomain
     const existing = await db.query.landings.findFirst({
@@ -188,6 +201,9 @@ export async function generateLandingMagic(formData: FormData) {
 
         revalidatePath("/dashboard/landings");
         revalidatePath("/dashboard");
+
+        // Increment AI Usage
+        await incrementAIGenerationProgress();
 
         return { success: true, id: newLanding.id };
     } catch (error: any) {

@@ -1,22 +1,21 @@
-import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
+import { Inter, JetBrains_Mono } from "next/font/google";
 import { ClerkProvider } from "@clerk/nextjs";
 import { Toaster } from "sonner";
 import "./globals.css";
 
-const geistSans = Geist({
-  variable: "--font-geist-sans",
+const inter = Inter({
+  variable: "--font-inter",
   subsets: ["latin"],
 });
 
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
+const jetbrainsMono = JetBrains_Mono({
+  variable: "--font-jetbrains-mono",
   subsets: ["latin"],
 });
 
 export const metadata: Metadata = {
-  title: "Landing Builder | Validate Micro-SaaS in Minutes",
-  description: "Create, host, and validate Micro-SaaS landing pages in less than 5 minutes with plug-and-play integrations.",
+  title: "ShipKit | Ship your idea in 5 minutes",
+  description: "The complete toolkit for indie hackers to build and validate micro-SaaS landing pages without code.",
 };
 
 export default function RootLayout({
@@ -28,7 +27,7 @@ export default function RootLayout({
     <ClerkProvider>
       <html lang="en">
         <body
-          className={`${geistSans.variable} ${geistMono.variable} antialiased`}
+          className={`${inter.variable} ${jetbrainsMono.variable} font-sans antialiased`}
         >
           {children}
           <Toaster position="bottom-right" richColors />

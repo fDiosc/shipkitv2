@@ -19,14 +19,25 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { PlusCircle, Loader2, Wand2, Layout } from "lucide-react";
+import { PlusCircle, Loader2, Wand2, Layout, Sparkles } from "lucide-react";
 import { toast } from "sonner";
+import { UpgradeModal } from "./UpgradeModal";
+import { checkAIGenerationLimit } from "@/app/actions/usage";
+import { useEffect } from "react";
 
 export function NewLandingModal({ children }: { children?: React.ReactNode }) {
     const [open, setOpen] = useState(false);
     const [loading, setLoading] = useState(false);
     const [mode, setMode] = useState<"template" | "ai">("ai");
+    const [upgradeType, setUpgradeType] = useState<"ai" | "landings" | null>(null);
+    const [aiUsage, setAiUsage] = useState<{ remaining: number | string } | null>(null);
     const router = useRouter();
+
+    useEffect(() => {
+        if (open) {
+            checkAIGenerationLimit().then(setAiUsage);
+        }
+    }, [open]);
 
     async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
         event.preventDefault();
@@ -44,7 +55,13 @@ export function NewLandingModal({ children }: { children?: React.ReactNode }) {
                 setOpen(false);
                 router.push(`/editor/${result.id}`);
             } else {
-                toast.error(result.error || "Something went wrong");
+                if (result.error?.includes("Landing limit reached")) {
+                    setUpgradeType("landings");
+                } else if (result.error?.includes("AI generation limit reached")) {
+                    setUpgradeType("ai");
+                } else {
+                    toast.error(result.error || "Something went wrong");
+                }
             }
         } catch (error) {
             toast.error("An unexpected error occurred");
@@ -109,11 +126,19 @@ export function NewLandingModal({ children }: { children?: React.ReactNode }) {
 
                             <TabsContent value="ai" className="mt-0 space-y-4">
                                 <div className="grid gap-2">
-                                    <Label htmlFor="description">Business Description</Label>
+                                    <div className="flex items-center justify-between">
+                                        <Label htmlFor="description">Business Description</Label>
+                                        {aiUsage && (
+                                            <span className="text-[10px] font-black uppercase text-blue-600 bg-blue-50 px-2 py-0.5 rounded-full flex items-center gap-1">
+                                                <Sparkles className="h-2.5 w-2.5" />
+                                                {aiUsage.remaining === "unlimited" ? "Unlimited AI" : `${aiUsage.remaining} AI remaining`}
+                                            </span>
+                                        )}
+                                    </div>
                                     <Textarea
                                         id="description"
                                         name="description"
-                                        className="h-32 resize-none"
+                                        className="h-32 hide-scrollbar resize-none"
                                         placeholder="Explain what your product does, who it's for, and what makes it special. We'll generate the copy and layout for you."
                                         required={mode === "ai"}
                                     />
@@ -143,8 +168,8 @@ export function NewLandingModal({ children }: { children?: React.ReactNode }) {
                             type="submit"
                             disabled={loading}
                             className={`w-full font-bold transition-all ${mode === "ai"
-                                    ? "bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 shadow-lg shadow-purple-200"
-                                    : "bg-blue-600 hover:bg-blue-700"
+                                ? "bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 shadow-lg shadow-purple-200"
+                                : "bg-blue-600 hover:bg-blue-700"
                                 }`}
                         >
                             {loading ? (
@@ -159,6 +184,17 @@ export function NewLandingModal({ children }: { children?: React.ReactNode }) {
                     </DialogFooter>
                 </form>
             </DialogContent>
+
+            <UpgradeModal
+                isOpen={upgradeType !== null}
+                onClose={() => setUpgradeType(null)}
+                type={upgradeType || "ai"}
+                title={upgradeType === "ai" ? "Monthly AI Limit Reached" : "Landing Limit Reached"}
+                description={upgradeType === "ai"
+                    ? "You've used your 10 free AI generations this month. Upgrade to Pro for unlimited magic! ✨"
+                    : "Wait! You've reached the free limit of 2 landing pages. Ready to go big? 🚀"
+                }
+            />
         </Dialog>
     );
 }

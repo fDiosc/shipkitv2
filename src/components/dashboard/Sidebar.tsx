@@ -16,6 +16,7 @@ import {
 } from "lucide-react";
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
+import { Logo } from "../brand/Logo";
 
 const navItems = [
     { name: "Dashboard", href: "/dashboard", icon: LayoutDashboard },
@@ -38,10 +39,10 @@ export function Sidebar() {
         >
             {/* Header / Logo */}
             <div className="flex h-16 items-center px-4">
-                <Link href="/dashboard" className="flex items-center gap-2 font-bold text-blue-600">
-                    <Rocket className="h-6 w-6 shrink-0" />
-                    {!isCollapsed && <span className="text-lg tracking-tight animate-in fade-in duration-500">Landing Builder</span>}
-                </Link>
+                <Logo
+                    iconOnly={isCollapsed}
+                    className="!gap-2"
+                />
             </div>
 
             {/* Navigation */}

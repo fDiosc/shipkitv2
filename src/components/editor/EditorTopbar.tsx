@@ -16,6 +16,7 @@ import {
 import { useState } from "react";
 import { toast } from "sonner";
 import { saveLanding, publishLanding } from "@/app/dashboard/landings/actions";
+import { ProjectSettingsModal } from "./ProjectSettingsModal";
 
 export function Topbar({ landingId, landingName }: { landingId: string; landingName: string }) {
     const router = useRouter();
@@ -98,6 +99,7 @@ export function Topbar({ landingId, landingName }: { landingId: string; landingN
             </div>
 
             <div className="flex items-center gap-2">
+                <ProjectSettingsModal landingId={landingId} />
                 <Button variant="outline" size="sm" className="gap-2">
                     <Play className="h-4 w-4" />
                     Preview

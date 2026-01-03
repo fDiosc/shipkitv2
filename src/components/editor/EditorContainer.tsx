@@ -19,14 +19,20 @@ import { LogoCloud } from "./selectors/LogoCloud";
 import { Header } from "./selectors/Header";
 import { Footer } from "./selectors/Footer";
 
+import { LandingProvider } from "./LandingContext";
+
 export function EditorContainer({
     landingId,
     landingName,
-    initialData
+    initialData,
+    integrations
 }: {
     landingId: string;
     landingName: string;
     initialData?: string | null;
+    integrations?: {
+        calCom?: string | null;
+    };
 }) {
     return (
         <Editor
@@ -46,30 +52,32 @@ export function EditorContainer({
             }}
             onRender={RenderNode}
         >
-            <div className="flex flex-col h-screen bg-neutral-100">
-                <Topbar landingId={landingId} landingName={landingName} />
-                <div className="flex flex-1 overflow-hidden">
-                    {/* Toolbox - Left Sidebar */}
-                    <Toolbox />
+            <LandingProvider landingId={landingId} integrations={integrations}>
+                <div className="flex flex-col h-screen bg-neutral-100">
+                    <Topbar landingId={landingId} landingName={landingName} />
+                    <div className="flex flex-1 overflow-hidden">
+                        {/* Toolbox - Left Sidebar */}
+                        <Toolbox />
 
-                    {/* Canvas - Center Area */}
-                    <main className="flex-1 overflow-y-auto p-8">
-                        <div className="mx-auto bg-white shadow-xl min-h-screen max-w-5xl rounded-lg overflow-hidden">
-                            <Frame data={initialData || undefined}>
-                                <Element is={Container} padding={20} canvas>
-                                    {/* Default initial content if none provided */}
-                                    {!initialData && (
-                                        <Hero title="Your New Project" subtitle="Edit this page to start validating your idea." />
-                                    )}
-                                </Element>
-                            </Frame>
-                        </div>
-                    </main>
+                        {/* Canvas - Center Area */}
+                        <main className="flex-1 overflow-y-auto p-8">
+                            <div className="mx-auto bg-white shadow-xl min-h-screen max-w-5xl rounded-lg overflow-hidden">
+                                <Frame data={initialData || undefined}>
+                                    <Element is={Container} padding={20} canvas>
+                                        {/* Default initial content if none provided */}
+                                        {!initialData && (
+                                            <Hero title="Your New Project" subtitle="Edit this page to start validating your idea." />
+                                        )}
+                                    </Element>
+                                </Frame>
+                            </div>
+                        </main>
 
-                    {/* Settings Panel - Right Sidebar */}
-                    <SettingsPanel />
+                        {/* Settings Panel - Right Sidebar */}
+                        <SettingsPanel />
+                    </div>
                 </div>
-            </div>
+            </LandingProvider>
         </Editor>
     );
 }

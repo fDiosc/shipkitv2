@@ -1,12 +1,25 @@
-"use client";
-
+import { db } from "@/db";
+import { profiles } from "@/db/schema";
+import { auth, currentUser } from "@clerk/nextjs/server";
+import { eq } from "drizzle-orm";
+import { redirect } from "next/navigation";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
+import { IntegrationsSettings } from "@/components/dashboard/IntegrationsSettings";
 
-export default function SettingsPage() {
+export default async function SettingsPage() {
+    const { userId } = await auth();
+    if (!userId) redirect("/sign-in");
+
+    const profile = await db.query.profiles.findFirst({
+        where: eq(profiles.id, userId),
+    });
+
+    const user = await currentUser();
+
     return (
         <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
             <div>
@@ -23,14 +36,16 @@ export default function SettingsPage() {
                     <CardContent className="space-y-4">
                         <div className="grid gap-2">
                             <Label htmlFor="email">Email Address</Label>
-                            <Input id="email" disabled placeholder="felipe@example.com" value="user@example.com" />
+                            <Input id="email" disabled value={user?.emailAddresses[0]?.emailAddress || ""} />
                         </div>
                         <Separator />
                         <div className="flex justify-end">
-                            <Button className="bg-blue-600 hover:bg-blue-700">Save Changes</Button>
+                            <Button disabled className="bg-neutral-200 text-neutral-500">Save Changes</Button>
                         </div>
                     </CardContent>
                 </Card>
+
+                <IntegrationsSettings initialCalComUsername={profile?.calComUsername} />
 
                 <Card className="shadow-sm border-red-100 bg-red-50/30">
                     <CardHeader>

@@ -2,6 +2,7 @@
 
 import { db } from "@/db";
 import { landings } from "@/db/schema";
+import { checkLandingLimit } from "@/app/actions/usage";
 import { auth } from "@clerk/nextjs/server";
 import { eq } from "drizzle-orm";
 import { revalidatePath } from "next/cache";
@@ -10,6 +11,12 @@ import { redirect } from "next/navigation";
 export async function createLanding(formData: FormData) {
     const { userId } = await auth();
     if (!userId) throw new Error("Unauthorized");
+
+    // Check Landing Limit
+    const { allowed } = await checkLandingLimit();
+    if (!allowed) {
+        return { success: false, error: "Landing limit reached. Upgrade to Pro for unlimited landings! 🚀" };
+    }
 
     const name = formData.get("name") as string;
     const subdomain = formData.get("subdomain") as string;
@@ -95,5 +102,23 @@ export async function publishLanding(id: string) {
         return { success: true };
     } catch (error) {
         return { success: false, error: "Failed to publish" };
+    }
+}
+export async function saveIntegrations(id: string, integrations: any) {
+    const { userId } = await auth();
+    if (!userId) throw new Error("Unauthorized");
+
+    try {
+        await db.update(landings)
+            .set({
+                integrations,
+                updatedAt: new Date()
+            })
+            .where(eq(landings.id, id));
+
+        revalidatePath(`/editor/${id}`);
+        return { success: true };
+    } catch (error) {
+        return { success: false, error: "Failed to save integrations" };
     }
 }

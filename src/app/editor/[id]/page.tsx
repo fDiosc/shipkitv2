@@ -1,5 +1,5 @@
 import { db } from "@/db";
-import { landings } from "@/db/schema";
+import { landings, profiles } from "@/db/schema";
 import { auth } from "@clerk/nextjs/server";
 import { eq } from "drizzle-orm";
 import { notFound, redirect } from "next/navigation";
@@ -25,11 +25,21 @@ export default async function EditorPage({ params }: { params: Promise<{ id: str
 
     const initialData = isCraftState ? JSON.stringify(landing.designJson) : null;
 
+    const profile = await db.query.profiles.findFirst({
+        where: eq(profiles.id, userId),
+    });
+
+    const projectIntegrations = (landing.integrations as any) || {};
+    const integrations = {
+        calCom: projectIntegrations.calCom || profile?.calComUsername
+    };
+
     return (
         <EditorContainer
             landingId={landing.id}
             landingName={landing.name}
             initialData={initialData}
+            integrations={integrations}
         />
     );
 }

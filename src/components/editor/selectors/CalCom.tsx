@@ -1,4 +1,4 @@
-"use client";
+import { LandingProvider, useLanding } from '../LandingContext';
 
 import { useNode } from "@craftjs/core";
 import { Label } from "@/components/ui/label";
@@ -19,6 +19,8 @@ export const CalCom = ({
         selected: state.events.selected,
     }));
 
+    const { integrations } = useLanding();
+
     useEffect(() => {
         (async function () {
             const cal = await getCalApi();
@@ -26,7 +28,12 @@ export const CalCom = ({
         })();
     }, []);
 
-    const link = calLink || "peerlist/demo"; // Fallback demo link
+    // Priority: 
+    // 1. Specifically set in this block (calLink prop)
+    // 2. Project-level integration
+    // 3. Global-level integration
+    // 4. Default fallback
+    const link = calLink || integrations?.calCom || "peerlist/demo";
 
     return (
         <div

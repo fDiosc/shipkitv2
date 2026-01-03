@@ -8,6 +8,9 @@ export const profiles = pgTable("profiles", {
   avatarUrl: text("avatar_url"),
   subscriptionTier: varchar("subscription_tier", { length: 20 }).default("free"),
   stripeCustomerId: varchar("stripe_customer_id", { length: 100 }),
+  calComUsername: varchar("cal_com_username", { length: 255 }),
+  aiGenerationsUsed: integer("ai_generations_used").default(0).notNull(),
+  aiGenerationsResetAt: timestamp("ai_generations_reset_at").defaultNow().notNull(),
   createdAt: timestamp("created_at").defaultNow().notNull(),
   updatedAt: timestamp("updated_at").defaultNow().notNull(),
 });
