@@ -45,17 +45,17 @@ export const Toolbox = () => {
                         <ToolboxItem
                             label="Header"
                             icon={<LayoutIcon size={18} />}
-                            move={(ref) => connectors.create(ref, <Header />)}
+                            move={(ref: HTMLElement) => connectors.create(ref, <Header />)}
                         />
                         <ToolboxItem
                             label="Section"
                             icon={<Layout size={18} />}
-                            move={(ref) => connectors.create(ref, <Element is={Container} padding={20} canvas />)}
+                            move={(ref: HTMLElement) => connectors.create(ref, <Element is={Container} padding={20} canvas />)}
                         />
                         <ToolboxItem
                             label="Footer"
                             icon={<PanelsTopLeft size={18} />}
-                            move={(ref) => connectors.create(ref, <Footer />)}
+                            move={(ref: HTMLElement) => connectors.create(ref, <Footer />)}
                         />
                     </div>
                 </div>
@@ -67,12 +67,12 @@ export const Toolbox = () => {
                         <ToolboxItem
                             label="Text"
                             icon={<Type size={18} />}
-                            move={(ref) => connectors.create(ref, <Text text="Click to edit" />)}
+                            move={(ref: HTMLElement) => connectors.create(ref, <Text text="Click to edit" />)}
                         />
                         <ToolboxItem
                             label="Button"
                             icon={<MousePointer2 size={18} />}
-                            move={(ref) => connectors.create(ref, <ButtonSelector text="Click me" />)}
+                            move={(ref: HTMLElement) => connectors.create(ref, <ButtonSelector text="Click me" />)}
                         />
                     </div>
                 </div>
@@ -84,37 +84,37 @@ export const Toolbox = () => {
                         <ToolboxItem
                             label="Hero"
                             icon={<Square size={18} />}
-                            move={(ref) => connectors.create(ref, <Hero title="Hero Title" subtitle="Subtitle here" />)}
+                            move={(ref: HTMLElement) => connectors.create(ref, <Hero title="Hero Title" subtitle="Subtitle here" />)}
                         />
                         <ToolboxItem
                             label="Waitlist"
                             icon={<Users size={18} />}
-                            move={(ref) => connectors.create(ref, <LeadForm />)}
+                            move={(ref: HTMLElement) => connectors.create(ref, <LeadForm />)}
                         />
                         <ToolboxItem
                             label="Features"
                             icon={<Zap size={18} />}
-                            move={(ref) => connectors.create(ref, <FeatureCards />)}
+                            move={(ref: HTMLElement) => connectors.create(ref, <FeatureCards />)}
                         />
                         <ToolboxItem
                             label="Pricing"
                             icon={<CreditCard size={18} />}
-                            move={(ref) => connectors.create(ref, <PricingTable />)}
+                            move={(ref: HTMLElement) => connectors.create(ref, <PricingTable />)}
                         />
                         <ToolboxItem
                             label="FAQ"
                             icon={<HelpCircle size={18} />}
-                            move={(ref) => connectors.create(ref, <FAQ />)}
+                            move={(ref: HTMLElement) => connectors.create(ref, <FAQ />)}
                         />
                         <ToolboxItem
                             label="Social"
                             icon={<Users size={18} />}
-                            move={(ref) => connectors.create(ref, <LogoCloud />)}
+                            move={(ref: HTMLElement) => connectors.create(ref, <LogoCloud />)}
                         />
                         <ToolboxItem
                             label="Cal.com"
                             icon={<Calendar size={18} />}
-                            move={(ref) => connectors.create(ref, <CalCom />)}
+                            move={(ref: HTMLElement) => connectors.create(ref, <CalCom />)}
                         />
                     </div>
                 </div>
