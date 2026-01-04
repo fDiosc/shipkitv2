@@ -23,7 +23,7 @@ import { NewLandingModal } from "@/components/dashboard/NewLandingModal";
 import { DeleteLandingAction } from "@/components/dashboard/DeleteLandingAction";
 import { DomainSettings } from "@/components/dashboard/DomainSettings";
 import Link from "next/link";
-import { getLandingUrl } from "@/lib/urls";
+import { getLandingUrl, normalizeDomain } from "@/lib/urls";
 
 export default async function LandingsPage() {
     const { userId } = await auth();
@@ -80,7 +80,7 @@ export default async function LandingsPage() {
                                     </TableCell>
                                     <TableCell className="text-neutral-500">
                                         <span className="flex items-center gap-1">
-                                            {landing.subdomain}.{process.env.NEXT_PUBLIC_ROOT_DOMAIN || (process.env.NODE_ENV === "development" ? "localhost:3000" : "landingbuilder.com")}
+                                            {landing.subdomain}.{normalizeDomain(process.env.NEXT_PUBLIC_ROOT_DOMAIN || "shipkit.app")}
                                             <ExternalLink className="h-3 w-3 opacity-0 group-hover:opacity-100 transition-opacity" />
                                         </span>
                                     </TableCell>

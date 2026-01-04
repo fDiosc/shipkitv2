@@ -4,6 +4,8 @@ import { db } from "@/db";
 import { landings } from "@/db/schema";
 import { eq } from "drizzle-orm";
 
+import { normalizeDomain } from "@/lib/urls";
+
 const isProtectedRoute = createRouteMatcher(["/dashboard(.*)", "/api/admin(.*)"]);
 
 export default clerkMiddleware(async (auth, req) => {
@@ -11,7 +13,8 @@ export default clerkMiddleware(async (auth, req) => {
     const hostname = req.headers.get("host") || "localhost:3000";
 
     // Define the root domain
-    const rootDomain = process.env.NEXT_PUBLIC_ROOT_DOMAIN || "localhost:3000";
+    const rawRootDomain = process.env.NEXT_PUBLIC_ROOT_DOMAIN || "localhost:3000";
+    const rootDomain = normalizeDomain(rawRootDomain);
 
     const searchParams = req.nextUrl.searchParams.toString();
     const path = `${url.pathname}${searchParams.length > 0 ? `?${searchParams}` : ''}`;
