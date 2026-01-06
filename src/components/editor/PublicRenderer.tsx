@@ -14,6 +14,7 @@ import { FAQ } from './selectors/FAQ';
 import { LogoCloud } from './selectors/LogoCloud';
 import { Header } from "./selectors/Header";
 import { Footer } from "./selectors/Footer";
+import { Storylane } from "./selectors/Storylane";
 
 // Map of component names to their actual implementations.
 const publicResolvers = {
@@ -28,7 +29,8 @@ const publicResolvers = {
     FAQ,
     LogoCloud,
     Header,
-    Footer
+    Footer,
+    Storylane
 };
 
 import { LandingProvider } from './LandingContext';
