@@ -39,7 +39,7 @@ export default function Home() {
                 Ship your idea in <span className="text-blue-600">5 minutes.</span>
               </h1>
               <p className="mx-auto mt-8 max-w-2xl text-xl text-neutral-500 font-medium md:text-2xl leading-relaxed">
-                Landing pages with built-in emails, payments, and <span className="text-blue-600 font-black">native analytics.</span><br className="hidden md:block" />
+                Landing pages with built-in emails, payments, <span className="text-blue-600 font-black">interactive demos</span>, and <span className="text-blue-600 font-black">native analytics.</span><br className="hidden md:block" />
                 No code required. No tracking IDs to paste. Just results.
               </p>
               <div className="mt-12 flex flex-col items-center justify-center gap-6 sm:flex-row">
@@ -52,13 +52,14 @@ export default function Home() {
                 </Link>
               </div>
 
-              <div className="mt-16 flex items-center justify-center gap-4 text-sm font-bold text-neutral-400">
-                <div className="flex -space-x-2">
-                  {[1, 2, 3, 4].map(i => (
-                    <div key={i} className="w-8 h-8 rounded-full border-2 border-white bg-neutral-200" />
-                  ))}
-                </div>
-                Join 100+ indie hackers shipping fast
+              <div className="mt-16 inline-flex items-center gap-3 px-5 py-3 bg-blue-50 rounded-full border border-blue-200 animate-in fade-in zoom-in duration-1000 delay-500">
+                <span className="relative flex h-3 w-3">
+                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-blue-400 opacity-75"></span>
+                  <span className="relative inline-flex rounded-full h-3 w-3 bg-blue-500"></span>
+                </span>
+                <p className="text-sm font-bold text-blue-900">
+                  Early Access • <span className="text-blue-600">Pro 50% discount</span> for first 10 users
+                </p>
               </div>
             </div>
           </div>
@@ -170,6 +171,76 @@ export default function Home() {
             </div>
           </div>
         </section>
+        {/* Integrations & Modules */}
+        <section id="integrations" className="py-32 bg-white">
+          <div className="container mx-auto px-4 md:px-6">
+            <div className="text-center mb-20">
+              <h2 className="text-4xl md:text-5xl font-black tracking-tight mb-6">Zero-Config Integrations</h2>
+              <p className="text-xl text-neutral-500 font-medium">Your favorite tools, natively supported. Just drop your ID and go.</p>
+            </div>
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+              <IntegrationCard
+                title="Storylane"
+                description="Interactive product tours that convert browsers into buyers."
+                icon={<Play className="h-6 w-6" />}
+                badge="Demos"
+                color="purple"
+              />
+              <IntegrationCard
+                title="Cal.com"
+                description="Hassle-free scheduling for demos and consultations."
+                icon={<Globe className="h-6 w-6" />}
+                badge="Bookings"
+                color="blue"
+              />
+              <IntegrationCard
+                title="Resend"
+                description="Automated waitlists and email capture that just works."
+                icon={<Rocket className="h-6 w-6" />}
+                badge="Emails"
+                color="green"
+              />
+              <IntegrationCard
+                title="Analytics"
+                description="Built-in tracking for visitors, sources, and conversion."
+                icon={<BarChart3 className="h-6 w-6" />}
+                badge="Native"
+                color="orange"
+              />
+            </div>
+          </div>
+        </section>
+
+        {/* FAQ Section */}
+        <section id="faq" className="py-32 bg-neutral-50/50">
+          <div className="container mx-auto px-4 md:px-6">
+            <div className="text-center mb-20">
+              <h2 className="text-4xl md:text-5xl font-black tracking-tight">Frequently Asked Questions</h2>
+            </div>
+            <div className="max-w-3xl mx-auto space-y-6">
+              <FAQItem
+                question="Do I need coding skills?"
+                answer="Nope! ShipKit is 100% no-code. Describe your idea, AI does the rest. You can customize everything visually."
+              />
+              <FAQItem
+                question="Can I use my own domain?"
+                answer="Yes! Pro plan supports unlimited custom domains with simple CNAME setup. We handle SSL automatically."
+              />
+              <FAQItem
+                question="How do payments work?"
+                answer="Connect your Stripe account via OAuth. Money goes directly to you. We never touch your revenue."
+              />
+              <FAQItem
+                question="What if I want to cancel?"
+                answer="Cancel anytime. Your landings stay live until the end of your billing period. No hidden fees."
+              />
+              <FAQItem
+                question="How accurate is the AI?"
+                answer="AI generates professional, high-converting copy in 10 seconds. You can edit every word before publishing."
+              />
+            </div>
+          </div>
+        </section>
 
         {/* Pricing */}
         <section id="pricing" className="py-32 bg-white">
@@ -179,7 +250,13 @@ export default function Home() {
               <p className="text-xl text-neutral-500 font-medium">Pay for what you need, grow as you ship.</p>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-4xl mx-auto">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-4xl mx-auto relative">
+              {/* Launch Special Badge */}
+              <div className="absolute -top-6 left-1/2 transform -translate-x-1/2 z-20">
+                <div className="bg-gradient-to-r from-blue-600 to-purple-600 text-white px-6 py-2 rounded-full text-sm font-bold shadow-xl border-2 border-white animate-bounce">
+                  🎉 Launch Special: 50% lifetime discount for first 10 Pro users
+                </div>
+              </div>
               <PricingCard
                 name="Free"
                 price="0"
@@ -241,6 +318,39 @@ export default function Home() {
           </div>
         </div>
       </footer>
+    </div>
+  );
+}
+
+function IntegrationCard({ title, description, icon, badge, color }: { title: string; description: string; icon: React.ReactNode; badge: string; color: string }) {
+  const colorMap: Record<string, string> = {
+    blue: "bg-blue-50 text-blue-600 border-blue-100",
+    purple: "bg-purple-50 text-purple-600 border-purple-100",
+    green: "bg-green-50 text-green-600 border-green-100",
+    orange: "bg-orange-50 text-orange-600 border-orange-100",
+  };
+
+  return (
+    <div className="p-8 rounded-[2rem] border border-neutral-100 bg-white hover:border-neutral-200 transition-all shadow-sm">
+      <div className={`w-12 h-12 rounded-xl flex items-center justify-center mb-6 ${colorMap[color]}`}>
+        {icon}
+      </div>
+      <div className="flex items-center gap-2 mb-3">
+        <h3 className="text-xl font-black text-neutral-900">{title}</h3>
+        <span className={`text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full ${colorMap[color]}`}>
+          {badge}
+        </span>
+      </div>
+      <p className="text-sm font-medium text-neutral-500 leading-relaxed">{description}</p>
+    </div>
+  );
+}
+
+function FAQItem({ question, answer }: { question: string; answer: string }) {
+  return (
+    <div className="p-8 rounded-3xl bg-white border border-neutral-100 shadow-sm">
+      <h3 className="text-lg font-black text-neutral-900 mb-2">{question}</h3>
+      <p className="text-neutral-500 font-medium leading-relaxed">{answer}</p>
     </div>
   );
 }
