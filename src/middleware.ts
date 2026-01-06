@@ -13,29 +13,32 @@ export default clerkMiddleware(async (auth, req) => {
     const hostname = req.headers.get("host") || "localhost:3000";
 
     // Define the root domain
-    const rawRootDomain = process.env.NEXT_PUBLIC_ROOT_DOMAIN || "localhost:3000";
+    const rawRootDomain = process.env.NEXT_PUBLIC_ROOT_DOMAIN || "shipkit.app";
     const rootDomain = normalizeDomain(rawRootDomain);
 
     const searchParams = req.nextUrl.searchParams.toString();
     const path = `${url.pathname}${searchParams.length > 0 ? `?${searchParams}` : ''}`;
 
-    // Extract subdomain
-    const subdomain = hostname.endsWith(rootDomain)
-        ? hostname.replace(`.${rootDomain}`, "").replace(/^www\./, "")
-        : null;
+    // Detection logic
+    const isRootDomain = hostname === rootDomain || hostname === `www.${rootDomain}` || hostname === "localhost:3000";
 
-    console.log(`[Proxy] Host: ${hostname}, Subdomain: ${subdomain}, Path: ${url.pathname}`);
+    console.log(`[Middleware] Host: ${hostname}, Root: ${rootDomain}, isRoot: ${isRootDomain}, Path: ${url.pathname}`);
 
     // 1. Handle Subdomain Routing (Public Landings)
-    if (subdomain && subdomain !== rootDomain && hostname !== rootDomain && subdomain !== "") {
-        const rewriteUrl = new URL(`/public/${subdomain}${path}`, req.url);
-        console.log(`[Proxy] Subdomain Rewrite: ${rewriteUrl.pathname}`);
-        return NextResponse.rewrite(rewriteUrl);
+    // Only if NOT the root domain and has a subdomain
+    if (!isRootDomain && hostname.endsWith(`.${rootDomain}`)) {
+        const subdomain = hostname.replace(`.${rootDomain}`, "").replace(/^www\./, "");
+
+        if (subdomain && subdomain !== "") {
+            const rewriteUrl = new URL(`/public/${subdomain}${path}`, req.url);
+            console.log(`[Middleware] Subdomain Rewrite: ${rewriteUrl.pathname}`);
+            return NextResponse.rewrite(rewriteUrl);
+        }
     }
 
     // 2. Handle Custom Domain Lookup
     // If not a subdomain and not the root domain, it might be a custom domain
-    if (!subdomain && hostname !== rootDomain && hostname !== "localhost:3000") {
+    if (!isRootDomain) {
         try {
             const landing = await db.query.landings.findFirst({
                 where: eq(landings.customDomain, hostname),
@@ -44,11 +47,11 @@ export default clerkMiddleware(async (auth, req) => {
 
             if (landing) {
                 const rewriteUrl = new URL(`/public/${landing.subdomain}${path}`, req.url);
-                console.log(`[Proxy] Custom Domain Rewrite: ${rewriteUrl.pathname}`);
+                console.log(`[Middleware] Custom Domain Rewrite: ${rewriteUrl.pathname}`);
                 return NextResponse.rewrite(rewriteUrl);
             }
         } catch (error) {
-            console.error("[Proxy] Custom domain error:", error);
+            console.error("[Middleware] Custom domain error:", error);
         }
     }
 
@@ -56,6 +59,8 @@ export default clerkMiddleware(async (auth, req) => {
     if (isProtectedRoute(req)) {
         await auth.protect();
     }
+
+    return NextResponse.next();
 });
 
 export const config = {
