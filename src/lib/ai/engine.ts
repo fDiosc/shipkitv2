@@ -64,6 +64,12 @@ const LandingSchema = z.object({
         subtitle: z.string(),
         calLink: z.string().describe("A guess for a cal.com link, e.g. company/demo"),
     }).strict(),
+    storylane: z.object({
+        isActive: z.boolean().describe("Set to true for products that benefit from interactive tours"),
+        title: z.string(),
+        subtitle: z.string(),
+        storylaneId: z.string().describe("A guess for a storylane demo id, e.g. x1y2z3"),
+    }).strict(),
 }).strict();
 
 // System Prompt for high-conversion minimalist design
@@ -263,7 +269,22 @@ CRITICAL RULES - FOLLOW EXACTLY
     calLink format: "[brandname-lowercase]/[meeting-type]"
     Example: "cloudflow/demo" or "acme/consultation"
 
-11. FOOTER:
+11. STORYLANE INTERACTIVE TOUR:
+
+    Activate ONLY if:
+    - SaaS product with complex UI
+    - Product tours are mentioned
+    - "Interactive demo" or "visual tour" is appropriate
+    - Description explains: "see how it works", "explore the interface"
+
+    Do NOT activate for:
+    - Physical products
+    - Very simple tools
+    - If uncertainty, set isActive: false
+
+    storylaneId: Generate a 6-10 character alphanumeric string as a placeholder.
+
+12. FOOTER:
     
     Use same brand name as header
 

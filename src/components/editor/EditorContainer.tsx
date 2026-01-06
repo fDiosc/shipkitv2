@@ -16,6 +16,7 @@ import { FeatureCards } from "./selectors/FeatureCards";
 import { CalCom } from "./selectors/CalCom";
 import { FAQ } from "./selectors/FAQ";
 import { LogoCloud } from "./selectors/LogoCloud";
+import { Storylane } from "./selectors/Storylane";
 import { Header } from "./selectors/Header";
 import { Footer } from "./selectors/Footer";
 
@@ -35,6 +36,7 @@ export function EditorContainer({
     initialData?: string | null;
     integrations?: {
         calCom?: string | null;
+        storylaneId?: string | null;
     };
 }) {
     const [showWizard, setShowWizard] = useState(false);
@@ -85,7 +87,8 @@ export function EditorContainer({
                 FAQ,
                 LogoCloud,
                 Header,
-                Footer
+                Footer,
+                Storylane
             }}
             onRender={RenderNode}
         >

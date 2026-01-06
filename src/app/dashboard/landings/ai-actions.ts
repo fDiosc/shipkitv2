@@ -61,6 +61,7 @@ export async function generateLandingMagic(formData: FormData) {
                     ...(aiData.pricing.isActive ? ["pricing-node"] : []),
                     ...(aiData.faq.isActive ? ["faq-node"] : []),
                     ...(aiData.calCom.isActive ? ["calcom-node"] : []),
+                    ...(aiData.storylane.isActive ? ["storylane-node"] : []),
                     "footer-node"
                 ],
                 displayName: "ROOT",
@@ -187,6 +188,20 @@ export async function generateLandingMagic(formData: FormData) {
                     parent: "ROOT",
                     nodes: [],
                     displayName: "Cal.com Scheduler",
+                    custom: {}
+                }
+            } : {}),
+            ...(aiData.storylane.isActive ? {
+                "storylane-node": {
+                    type: { resolvedName: "Storylane" },
+                    props: {
+                        title: aiData.storylane.title,
+                        subtitle: aiData.storylane.subtitle,
+                        storylaneId: aiData.storylane.storylaneId
+                    },
+                    parent: "ROOT",
+                    nodes: [],
+                    displayName: "Storylane Tour",
                     custom: {}
                 }
             } : {})

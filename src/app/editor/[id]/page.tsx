@@ -31,7 +31,8 @@ export default async function EditorPage({ params }: { params: Promise<{ id: str
 
     const projectIntegrations = (landing.integrations as any) || {};
     const integrations = {
-        calCom: projectIntegrations.calCom || profile?.calComUsername
+        calCom: projectIntegrations.calCom || profile?.calComUsername,
+        storylaneId: projectIntegrations.storylaneId || profile?.storylaneId
     };
 
     return (
