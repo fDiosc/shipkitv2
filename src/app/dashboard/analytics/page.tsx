@@ -4,7 +4,8 @@ import { useState, useEffect } from "react";
 import { Wizard, WizardStep } from "@/components/dashboard/Wizard";
 import { getProfile } from "@/app/actions/profile";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { BarChart3, TrendingUp, Users, DollarSign, Search } from "lucide-react";
+import { BarChart3, TrendingUp, Users, DollarSign, Search, Layout } from "lucide-react";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { AnalyticsDashboard } from "@/components/dashboard/AnalyticsDashboard";
 import { db } from "@/db"; // This will need to be a client-side fetch or we use a server component wrapper
 
@@ -14,6 +15,7 @@ import { db } from "@/db"; // This will need to be a client-side fetch or we use
 export default function AnalyticsPage() {
     const [showWizard, setShowWizard] = useState(false);
     const [landingId, setLandingId] = useState<string | null>(null);
+    const [landings, setLandings] = useState<any[]>([]);
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
@@ -30,6 +32,7 @@ export default function AnalyticsPage() {
                 const res = await fetch('/api/landings'); // We need this route or similar
                 const data = await res.json();
                 if (data.landings && data.landings.length > 0) {
+                    setLandings(data.landings);
                     setLandingId(data.landings[0].id);
                 }
             } catch (error) {
@@ -64,14 +67,34 @@ export default function AnalyticsPage() {
                     <h1 className="text-3xl font-bold tracking-tight text-neutral-900">Analytics</h1>
                     <p className="text-neutral-500">Track your performance across all landings.</p>
                 </div>
-                <div className="flex items-center gap-2 bg-white px-4 py-2 rounded-2xl border border-neutral-100 shadow-sm text-sm text-neutral-500">
-                    <Search className="h-4 w-4" />
-                    <span>Real-time filtering enabled</span>
+                <div className="flex items-center gap-4">
+                    {landings.length > 1 && (
+                        <Select value={landingId || ""} onValueChange={setLandingId}>
+                            <SelectTrigger className="w-[200px] bg-white border-neutral-100 shadow-sm rounded-xl">
+                                <Layout className="h-4 w-4 mr-2 text-blue-500" />
+                                <SelectValue placeholder="Select Landing" />
+                            </SelectTrigger>
+                            <SelectContent>
+                                {landings.map((l) => (
+                                    <SelectItem key={l.id} value={l.id}>
+                                        {l.name}
+                                    </SelectItem>
+                                ))}
+                            </SelectContent>
+                        </Select>
+                    )}
+                    <div className="flex items-center gap-2 bg-white px-4 py-2 rounded-2xl border border-neutral-100 shadow-sm text-sm text-neutral-500">
+                        <Search className="h-4 w-4" />
+                        <span>Real-time filtering enabled</span>
+                    </div>
                 </div>
             </div>
 
             {landingId ? (
-                <AnalyticsDashboard landingId={landingId} />
+                <AnalyticsDashboard
+                    landingId={landingId}
+                    landingName={landings.find(l => l.id === landingId)?.name}
+                />
             ) : loading ? (
                 <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
                     {[1, 2, 3, 4].map(i => <div key={i} className="h-32 bg-neutral-100 animate-pulse rounded-3xl" />)}

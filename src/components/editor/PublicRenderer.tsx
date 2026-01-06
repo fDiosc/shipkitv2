@@ -38,6 +38,7 @@ interface PublicRendererProps {
     landingId: string;
     integrations?: {
         calCom?: string | null;
+        storylaneId?: string | null;
     };
 }
 

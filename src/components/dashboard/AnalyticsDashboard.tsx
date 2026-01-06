@@ -27,7 +27,7 @@ interface AnalyticsData {
     conversionRate: string;
 }
 
-export function AnalyticsDashboard({ landingId }: { landingId: string }) {
+export function AnalyticsDashboard({ landingId, landingName }: { landingId: string, landingName?: string }) {
     const [data, setData] = useState<AnalyticsData | null>(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
@@ -117,7 +117,9 @@ export function AnalyticsDashboard({ landingId }: { landingId: string }) {
                         <TrendingUp className="h-5 w-5 text-blue-600" />
                     </div>
                     <div>
-                        <h2 className="text-lg font-bold text-neutral-900">Performance Report</h2>
+                        <h2 className="text-lg font-bold text-neutral-900">
+                            {landingName ? `${landingName} Analysis` : "Performance Report"}
+                        </h2>
                         <p className="text-xs text-neutral-500">Track your scaling metrics</p>
                     </div>
                 </div>
@@ -140,28 +142,24 @@ export function AnalyticsDashboard({ landingId }: { landingId: string }) {
                     label="Page Views"
                     value={data.analytics.totalViews.toLocaleString()}
                     color="blue"
-                    trend="+12%" // Static for now, can be calculated
                 />
                 <MetricCard
                     icon={<Users className="h-5 w-5" />}
                     label="Unique Visitors"
                     value={data.analytics.uniqueVisitors.toLocaleString()}
                     color="green"
-                    trend="+15%"
                 />
                 <MetricCard
                     icon={<Mail className="h-5 w-5" />}
                     label="Leads (Source of Truth)"
                     value={data.leads.captured.toLocaleString()}
                     color="purple"
-                    trend="+8%"
                 />
                 <MetricCard
                     icon={<TrendingUp className="h-5 w-5" />}
                     label="Conversion Rate"
                     value={`${data.conversionRate}%`}
                     color="orange"
-                    trend="+5%"
                 />
             </div>
 
@@ -300,7 +298,7 @@ export function AnalyticsDashboard({ landingId }: { landingId: string }) {
     );
 }
 
-function MetricCard({ icon, label, value, color, trend }: { icon: React.ReactNode, label: string, value: string, color: 'blue' | 'green' | 'purple' | 'orange', trend: string }) {
+function MetricCard({ icon, label, value, color }: { icon: React.ReactNode, label: string, value: string, color: 'blue' | 'green' | 'purple' | 'orange' }) {
     const colors: Record<string, string> = {
         blue: 'bg-blue-50 text-blue-600 border-blue-100',
         green: 'bg-green-50 text-green-600 border-green-100',
@@ -313,10 +311,6 @@ function MetricCard({ icon, label, value, color, trend }: { icon: React.ReactNod
             <div className="flex items-start justify-between">
                 <div className={`p-3 rounded-2xl ${colors[color]} border shadow-inner`}>
                     {icon}
-                </div>
-                <div className="flex items-center text-[10px] font-black text-green-600 bg-green-50 px-2 py-1 rounded-full border border-green-100">
-                    <ArrowUpRight className="h-3 w-3 mr-0.5" />
-                    {trend}
                 </div>
             </div>
             <div className="mt-8">
