@@ -72,18 +72,15 @@ export default function Home() {
               <div className="relative rounded-[2.5rem] border-8 border-neutral-100 bg-neutral-50 shadow-2xl shadow-blue-100/50 overflow-hidden aspect-video group">
                 {/* Storylane Iframe Placeholder */}
                 <iframe
-                  src="https://app.storylane.io/demo/YOUR_STORYLANE_ID"
+                  src="https://app.storylane.io/demo/n23pbhx5zhvg"
                   className="absolute inset-0 w-full h-full border-none"
                   allowFullScreen
                   loading="lazy"
                   title="ShipKit Interactive Demo"
                 />
 
-                {/* Fallback Overlay if ID is missing */}
-                <div className="absolute inset-0 flex flex-col items-center justify-center bg-neutral-50 pointer-events-none group-hover:opacity-0 transition-opacity">
-                  <Sparkles className="h-12 w-12 text-blue-600 mb-4" />
-                  <p className="text-xl font-black text-neutral-900 tracking-tight">Interactive Product Tour</p>
-                  <p className="text-neutral-500 font-medium italic mt-2">Replace YOUR_STORYLANE_ID in page.tsx</p>
+                {/* Fallback Overlay - can be kept as a subtle gradient or removed */}
+                <div className="absolute inset-0 flex flex-col items-center justify-center bg-neutral-50/10 pointer-events-none group-hover:opacity-0 transition-opacity">
                 </div>
               </div>
             </div>
