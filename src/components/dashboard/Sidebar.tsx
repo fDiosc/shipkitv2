@@ -8,27 +8,43 @@ import {
     Globe,
     BarChart3,
     Settings,
-    Rocket,
     ChevronLeft,
     ChevronRight,
     PlusCircle,
-    Users
+    Users,
+    Play,
 } from "lucide-react";
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Logo } from "../brand/Logo";
-
-const navItems = [
-    { name: "Dashboard", href: "/dashboard", icon: LayoutDashboard },
-    { name: "My Landings", href: "/dashboard/landings", icon: Globe },
-    { name: "Leads", href: "/dashboard/leads", icon: Users },
-    { name: "Analytics", href: "/dashboard/analytics", icon: BarChart3 },
-    { name: "Settings", href: "/dashboard/settings", icon: Settings },
-];
+import { WorkspaceSwitcher } from "./WorkspaceSwitcher";
+import { useWorkspace } from "@/hooks/useWorkspace";
 
 export function Sidebar() {
     const pathname = usePathname();
     const [isCollapsed, setIsCollapsed] = useState(false);
+    const { workspace } = useWorkspace();
+
+    // Build nav items with workspace slug
+    const workspaceSlug = workspace?.slug || "";
+    const basePath = workspaceSlug ? `/dashboard/${workspaceSlug}` : "/dashboard";
+
+    const navItems = [
+        { name: "Dashboard", href: basePath, icon: LayoutDashboard },
+        { name: "Demos", href: `${basePath}/demos`, icon: Play },
+        { name: "Landings", href: `${basePath}/landings`, icon: Globe },
+        { name: "Leads", href: `${basePath}/leads`, icon: Users },
+        { name: "Analytics", href: `${basePath}/analytics`, icon: BarChart3 },
+        { name: "Settings", href: `${basePath}/settings`, icon: Settings },
+    ];
+
+    // Check if current path matches (exact for dashboard, startsWith for others)
+    const isActive = (href: string) => {
+        if (href === basePath) {
+            return pathname === href;
+        }
+        return pathname?.startsWith(href);
+    };
 
     return (
         <aside
@@ -48,42 +64,30 @@ export function Sidebar() {
             {/* Navigation */}
             <nav className="flex-1 space-y-1 px-2 py-4">
                 {navItems.map((item) => {
-                    const isActive = pathname === item.href;
+                    const active = isActive(item.href);
                     return (
                         <Link
                             key={item.href}
                             href={item.href}
                             className={cn(
                                 "group flex items-center rounded-lg px-3 py-2 text-sm font-medium transition-colors",
-                                isActive
+                                active
                                     ? "bg-blue-50 text-blue-600"
                                     : "text-neutral-500 hover:bg-neutral-50 hover:text-neutral-900"
                             )}
                         >
                             <item.icon className={cn(
                                 "h-5 w-5 shrink-0 transition-colors",
-                                isActive ? "text-blue-600" : "text-neutral-400 group-hover:text-neutral-600"
+                                active ? "text-blue-600" : "text-neutral-400 group-hover:text-neutral-600"
                             )} />
                             {!isCollapsed && (
                                 <span className="ml-3 truncate animate-in fade-in duration-500">{item.name}</span>
-                            )}
-                            {isActive && !isCollapsed && (
-                                <div className="ml-auto h-1.5 w-1.5 rounded-full bg-blue-600" />
                             )}
                         </Link>
                     );
                 })}
             </nav>
 
-            {/* Quick Action */}
-            {!isCollapsed && (
-                <div className="px-4 pb-4">
-                    <Button className="w-full justify-start gap-2 bg-blue-600 hover:bg-blue-700">
-                        <PlusCircle className="h-4 w-4" />
-                        <span>New Landing</span>
-                    </Button>
-                </div>
-            )}
 
             {/* Collapse Toggle */}
             <button
@@ -95,16 +99,26 @@ export function Sidebar() {
 
             {/* Bottom context / Branding */}
             {!isCollapsed && (
-                <div className="border-t border-neutral-100 p-4">
-                    <div className="rounded-lg bg-neutral-50 p-3">
-                        <p className="text-xs font-semibold text-neutral-400 uppercase tracking-wider">Plan</p>
-                        <p className="text-sm font-bold text-neutral-900">Free Tier</p>
-                        <Link href="/dashboard/billing" className="mt-2 block text-xs font-medium text-blue-600 hover:underline">
-                            Upgrade to Pro
-                        </Link>
+                <div className="mt-auto border-t border-neutral-100 p-4">
+                    <div className="flex items-center justify-between group/plan">
+                        <div>
+                            <p className="text-[10px] font-bold text-neutral-400 uppercase tracking-widest">Plan</p>
+                            <p className="text-sm font-semibold text-neutral-900 capitalize">
+                                {workspace?.plan || "Free"}
+                            </p>
+                        </div>
+                        {workspace?.plan !== "pro" && (
+                            <Link
+                                href={`${basePath}/settings/billing`}
+                                className="text-[11px] font-bold text-blue-600 hover:text-blue-700 bg-blue-50 px-2 py-1 rounded-md transition-colors"
+                            >
+                                Upgrade
+                            </Link>
+                        )}
                     </div>
                 </div>
             )}
         </aside>
     );
 }
+

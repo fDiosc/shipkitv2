@@ -11,6 +11,7 @@ import {
     DialogTitle,
     DialogFooter,
 } from "@/components/ui/dialog";
+import { VisuallyHidden } from "@radix-ui/react-visually-hidden";
 import { updateOnboardingStatus } from "@/app/actions/onboarding";
 
 export interface WizardStep {
@@ -68,6 +69,11 @@ export function Wizard({ wizardKey, steps, isOpen, onClose, showSkip = true }: W
             if (!v) handleSkip();
         }}>
             <DialogContent showCloseButton={false} className="sm:max-w-[500px] p-0 overflow-hidden border-none shadow-2xl rounded-3xl">
+                {/* Hidden title for accessibility */}
+                <VisuallyHidden>
+                    <DialogTitle>{steps[currentStep]?.title || "Wizard"}</DialogTitle>
+                </VisuallyHidden>
+
                 <div className="bg-gradient-to-br from-blue-600 to-blue-700 p-8 text-white relative">
                     <button
                         onClick={handleSkip}

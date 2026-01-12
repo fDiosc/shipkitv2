@@ -21,7 +21,7 @@ export default async function PublicLandingPage({
     }
 
     const profile = await db.query.profiles.findFirst({
-        where: eq(profiles.id, landing.userId),
+        where: eq(profiles.id, landing.createdById || landing.userId || ''),
     });
 
     const projectIntegrations = (landing.integrations as any) || {};

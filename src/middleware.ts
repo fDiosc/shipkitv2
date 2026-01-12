@@ -60,6 +60,15 @@ export default clerkMiddleware(async (auth, req) => {
         await auth.protect();
     }
 
+    // 4. Handle Embed Routes - Allow cross-origin embedding
+    if (url.pathname.startsWith('/productstory/embed/')) {
+        const response = NextResponse.next();
+        // Allow embedding from any origin
+        response.headers.set('X-Frame-Options', 'ALLOWALL');
+        response.headers.set('Content-Security-Policy', "frame-ancestors *");
+        return response;
+    }
+
     return NextResponse.next();
 });
 

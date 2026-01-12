@@ -3,6 +3,7 @@
 import { UserButton, useUser } from "@clerk/nextjs";
 import { Bell, Search } from "lucide-react";
 import { Input } from "@/components/ui/input";
+import { WorkspaceSwitcher } from "./WorkspaceSwitcher";
 
 export function Topbar() {
     const { user } = useUser();
@@ -13,34 +14,25 @@ export function Topbar() {
                 <div className="relative w-full">
                     <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-neutral-400" />
                     <Input
-                        placeholder="Search landings..."
-                        className="w-full bg-neutral-50 pl-9 border-none focus-visible:ring-1 focus-visible:ring-blue-100"
+                        placeholder="Search..."
+                        className="w-full h-9 bg-neutral-50 pl-9 border-none focus-visible:ring-1 focus-visible:ring-neutral-200 transition-all"
                     />
                 </div>
             </div>
 
-            <div className="flex items-center gap-4">
-                <button className="relative rounded-full p-2 text-neutral-400 hover:bg-neutral-50 hover:text-neutral-900 transition-colors">
-                    < Bell className="h-5 w-5" />
-                    <span className="absolute right-2 top-2 h-2 w-2 rounded-full bg-red-500 border-2 border-white" />
-                </button>
+            <div className="flex items-center gap-2">
+                <WorkspaceSwitcher />
 
-                <div className="h-6 w-[1px] bg-neutral-100 mx-2" />
+                <div className="h-4 w-[1px] bg-neutral-100 mx-2" />
 
-                <div className="flex items-center gap-3">
-                    <div className="text-right hidden sm:block">
-                        <p className="text-sm font-semibold text-neutral-900">{user?.fullName}</p>
-                        <p className="text-xs text-neutral-400">{user?.primaryEmailAddress?.emailAddress}</p>
-                    </div>
-                    <UserButton
-                        afterSignOutUrl="/"
-                        appearance={{
-                            elements: {
-                                userButtonAvatarBox: "h-9 w-9 border-2 border-white shadow-sm"
-                            }
-                        }}
-                    />
-                </div>
+                <UserButton
+                    afterSignOutUrl="/"
+                    appearance={{
+                        elements: {
+                            userButtonAvatarBox: "h-8 w-8 border border-neutral-200 shadow-sm"
+                        }
+                    }}
+                />
             </div>
         </header>
     );

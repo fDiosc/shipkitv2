@@ -2,8 +2,28 @@ import { Webhook } from 'svix'
 import { headers } from 'next/headers'
 import { WebhookEvent } from '@clerk/nextjs/server'
 import { db } from '@/db'
-import { profiles } from '@/db/schema'
+import { profiles, workspaces, workspaceMembers } from '@/db/schema'
 import { eq } from 'drizzle-orm'
+
+// Helper to generate a unique slug
+async function generateUniqueSlug(name: string): Promise<string> {
+    let slug = name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '').substring(0, 30);
+    let attempts = 0;
+
+    while (attempts < 10) {
+        const existing = await db.query.workspaces.findFirst({
+            where: eq(workspaces.slug, slug),
+        });
+
+        if (!existing) return slug;
+
+        const suffix = Math.random().toString(36).substring(2, 6);
+        slug = `${slug.substring(0, 25)}-${suffix}`;
+        attempts++;
+    }
+
+    return `workspace-${Date.now()}`;
+}
 
 export async function POST(req: Request) {
     const SIGNING_SECRET = process.env.CLERK_WEBHOOK_SECRET
@@ -51,30 +71,60 @@ export async function POST(req: Request) {
     const { id } = evt.data
     const eventType = evt.type
 
-    if (eventType === 'user.created' || eventType === 'user.updated') {
+    if (eventType === 'user.created') {
         const { first_name, last_name, image_url, email_addresses } = evt.data
         const email = email_addresses?.[0]?.email_address
-        const fullName = `${first_name} ${last_name}`.trim()
+        const fullName = `${first_name || ''} ${last_name || ''}`.trim() || email?.split('@')[0] || 'User'
 
+        // Create profile
         await db.insert(profiles)
             .values({
                 id: id as string,
                 fullName,
                 avatarUrl: image_url,
             })
-            .onConflictDoUpdate({
-                target: profiles.id,
-                set: {
-                    fullName,
-                    avatarUrl: image_url,
-                    updatedAt: new Date(),
-                }
+            .onConflictDoNothing()
+
+        // Create personal workspace
+        const workspaceName = `${fullName}'s Workspace`
+        const slug = await generateUniqueSlug(workspaceName)
+
+        const [workspace] = await db.insert(workspaces)
+            .values({
+                name: workspaceName,
+                slug,
             })
+            .returning()
+
+        // Add user as owner
+        await db.insert(workspaceMembers)
+            .values({
+                workspaceId: workspace.id,
+                userId: id as string,
+                role: 'owner',
+            })
+
+        console.log(`Created workspace '${workspaceName}' for user ${id}`)
+    }
+
+    if (eventType === 'user.updated') {
+        const { first_name, last_name, image_url } = evt.data
+        const fullName = `${first_name || ''} ${last_name || ''}`.trim()
+
+        await db.update(profiles)
+            .set({
+                fullName,
+                avatarUrl: image_url,
+                updatedAt: new Date(),
+            })
+            .where(eq(profiles.id, id as string))
     }
 
     if (eventType === 'user.deleted') {
+        // Workspaces and memberships will be deleted via cascade
         await db.delete(profiles).where(eq(profiles.id, id as string))
     }
 
     return new Response('Webhook received', { status: 200 })
 }
+
