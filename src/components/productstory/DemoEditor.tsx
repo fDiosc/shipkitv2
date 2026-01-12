@@ -10,7 +10,7 @@ import { HotspotListPanel } from "./editor/HotspotListPanel";
 import { DemoPlayer } from "./DemoPlayer";
 import { Button } from "@/components/ui/button";
 import { Upload, Image, Loader2 } from "lucide-react";
-import { addScreen, createHotspot, updateHotspot, deleteHotspot, deleteScreen, reorderHotspots } from "@/app/actions/demos";
+import { addScreen, createHotspot, updateHotspot, deleteHotspot, deleteScreen, reorderHotspots, reorderScreens } from "@/app/actions/demos";
 import { useDropzone } from "react-dropzone";
 import { cn } from "@/lib/utils";
 
@@ -269,13 +269,23 @@ export function DemoEditor({ demo, screens: initialScreens, steps, workspaceSlug
         setSelectedHotspotId(null);
     };
 
-    const handleScreensReorder = (newOrder: string[]) => {
+    const handleScreensReorder = useCallback(async (newOrder: string[]) => {
+        // Optimistic update
         const reordered = newOrder.map((id, index) => {
             const screen = screens.find(s => s.id === id);
             return screen ? { ...screen, order: index } : null;
         }).filter(Boolean) as Screen[];
+
         setScreens(reordered);
-    };
+
+        try {
+            await reorderScreens(demo.id, newOrder);
+            setHasChanges(true);
+        } catch (error) {
+            console.error("Error reordering screens:", error);
+            // Revert on error? For now just log
+        }
+    }, [screens, demo.id]);
 
     const handleHotspotsReorder = useCallback(async (screenId: string, orderedIds: string[]) => {
         // Optimistic update
@@ -336,12 +346,21 @@ export function DemoEditor({ demo, screens: initialScreens, steps, workspaceSlug
         <div className="flex h-screen w-screen bg-neutral-100">
             {/* Left Sidebar: Screens + Hotspots */}
             <div className="w-64 bg-white border-r flex flex-col shrink-0">
-                {/* Screens Section */}
-                <div className="p-4 border-b">
-                    <h3 className="font-semibold text-sm text-neutral-700 mb-2">
-                        Screens ({screens.length})
-                    </h3>
-                    <div className="max-h-48 overflow-y-auto">
+                <div className="p-4 border-b flex flex-col min-h-0">
+                    <div className="flex items-center justify-between mb-3">
+                        <h3 className="font-semibold text-sm text-neutral-700">
+                            Screens ({screens.length})
+                        </h3>
+                        {/* Smaller persistent upload trigger */}
+                        <div {...getRootProps()}>
+                            <input {...getInputProps()} />
+                            <Button variant="ghost" size="icon" className="h-7 w-7 text-indigo-600 hover:text-indigo-700 hover:bg-indigo-50">
+                                <Upload className="h-4 w-4" />
+                            </Button>
+                        </div>
+                    </div>
+
+                    <div className="flex-1 overflow-y-auto min-h-0 -mx-1 px-1">
                         <ScreenList
                             screens={screens}
                             selectedId={selectedScreenId}
@@ -349,30 +368,29 @@ export function DemoEditor({ demo, screens: initialScreens, steps, workspaceSlug
                             onReorder={handleScreensReorder}
                             onDelete={handleScreenDelete}
                         />
+
+                        {/* Prominent "Add Screen" button at the end of the list */}
+                        <div
+                            {...getRootProps()}
+                            className={cn(
+                                "mt-2 border-2 border-dashed rounded-xl p-4 text-center cursor-pointer transition-all",
+                                isDragActive ? "border-indigo-500 bg-indigo-50" : "border-neutral-200 hover:border-indigo-300 hover:bg-neutral-50",
+                                isUploading && "opacity-50 pointer-events-none"
+                            )}
+                        >
+                            <input {...getInputProps()} />
+                            {isUploading ? (
+                                <Loader2 className="h-5 w-5 mx-auto text-indigo-400 animate-spin" />
+                            ) : (
+                                <Upload className="h-5 w-5 mx-auto text-neutral-400" />
+                            )}
+                            <p className="text-[11px] font-medium text-neutral-500 mt-2">
+                                {isDragActive ? "Drop to upload" : "Add more screens"}
+                            </p>
+                        </div>
                     </div>
                 </div>
 
-                {/* Upload Area */}
-                <div className="px-4 py-3 border-b">
-                    <div
-                        {...getRootProps()}
-                        className={cn(
-                            "border-2 border-dashed rounded-lg p-3 text-center cursor-pointer transition-colors",
-                            isDragActive ? "border-blue-500 bg-blue-50" : "border-neutral-200 hover:border-neutral-300",
-                            isUploading && "opacity-50 pointer-events-none"
-                        )}
-                    >
-                        <input {...getInputProps()} />
-                        {isUploading ? (
-                            <Loader2 className="h-5 w-5 mx-auto text-neutral-400 animate-spin" />
-                        ) : (
-                            <Upload className="h-5 w-5 mx-auto text-neutral-400" />
-                        )}
-                        <p className="text-xs text-neutral-500 mt-1">
-                            {isDragActive ? "Drop here" : isUploading ? "Uploading..." : "Add screens"}
-                        </p>
-                    </div>
-                </div>
 
                 {/* Hotspots Section for current screen */}
                 {selectedScreen && (
