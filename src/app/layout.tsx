@@ -28,7 +28,9 @@ export default function RootLayout({
   return (
     <ClerkProvider>
       <html lang="en">
-        <head>
+        <body
+          className={`${inter.variable} ${jetbrainsMono.variable} font-sans antialiased`}
+        >
           <Script id="clarity-script" strategy="afterInteractive">
             {`
               (function(c,l,a,r,i,t,y){
@@ -38,10 +40,6 @@ export default function RootLayout({
               })(window, document, "clarity", "script", "v0jlo46x84");
             `}
           </Script>
-        </head>
-        <body
-          className={`${inter.variable} ${jetbrainsMono.variable} font-sans antialiased`}
-        >
           {children}
           <Toaster position="bottom-right" richColors />
         </body>
